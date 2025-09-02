@@ -26,7 +26,16 @@ export default async function handler(req, res) {
     const urlObj = new URL(req.url, "http://localhost");
     const key = urlObj.searchParams.get("key");
     if (!key) { res.statusCode = 400; return res.end(JSON.stringify({ error: "key required" })); }
-    const url = await getSignedUrl(s3, new GetObjectCommand({ Bucket: WASABI_BUCKET, Key: key }), { expiresIn: 900 });
+
+    const filename = key.split("/").pop() || "file";
+    const cmd = new GetObjectCommand({
+      Bucket: WASABI_BUCKET,
+      Key: key,
+      ResponseContentDisposition: `attachment; filename="${filename}"`
+      // ResponseContentType: "application/octet-stream" // decommenta se vuoi forzare sempre download
+    });
+
+    const url = await getSignedUrl(s3, cmd, { expiresIn: 900 });
     res.setHeader("content-type", "application/json");
     res.end(JSON.stringify({ url }));
   } catch (e) {
