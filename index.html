@@ -1,509 +1,302 @@
 <!doctype html>
 <html lang="it">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Gestione Video clienti Aagency</title>
-<style>
-  :root{
-    --black:#000; --black-2:#111; --red:#b00020; --red-2:#8a0019;
-    --muted:#666; --line:#eee; --bg:#fafafa;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:#fff;font:14px system-ui,-apple-system,Segoe UI,Roboto,Arial}
-  .wrap{max-width:1100px;margin:18px auto;padding:0 12px}
-
-  .head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:18px}
-  h1{margin:0;font-size:22px}
-  .sub{color:var(--muted);font-size:13px;margin-top:4px}
-
-  .btn{padding:10px 14px;border:none;border-radius:10px;cursor:pointer;background:var(--black);color:#fff;line-height:1}
-  .btn:hover{background:var(--black-2)}
-  .btn-sm{padding:8px 12px;border-radius:8px;font-size:13px}
-  .btn-muted{background:#444}
-  .btn-danger{background:var(--red)}
-  .btn-danger:hover{background:var(--red-2)}
-  .field{padding:8px 10px;border:1px solid #ccc;border-radius:8px;min-height:44px}
-  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
-
-  .pillbar{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-  .pill{padding:7px 12px;border:1px solid #ddd;border-radius:999px;background:#f7f7f7;cursor:pointer}
-  .pill.active{background:var(--black);color:#fff;border-color:var(--black)}
-
-  .tabs{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:6px 0 12px}
-  .tab{padding:9px 14px;border:1px solid #ddd;border-radius:10px;cursor:pointer;background:#f7f7f7}
-  .tab.active{background:var(--black);color:#fff;border-color:var(--black)}
-
-  .card{border:1px solid var(--line);border-radius:10px;padding:12px}
-  .muted{color:var(--muted)}
-  .crumb{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-  .badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#f2f2f2;font-size:12px}
-  .badge.dark{background:var(--black);color:#fff}
-
-  .dropzone{min-height:140px;border:2px dashed #bbb;border-radius:12px;display:flex;align-items:center;justify-content:center;text-align:center;padding:18px}
-  .dropzone.drag{border-color:#999}
-
-  .tablewrap{overflow:auto;-webkit-overflow-scrolling:touch;border-radius:8px}
-  table{width:100%;border-collapse:collapse;min-width:720px}
-  th,td{padding:8px;border-bottom:1px solid var(--line)}
-  tbody tr:nth-child(odd){background:var(--bg)}
-
-  .toast{position:fixed;right:12px;bottom:12px;max-width:70vw;background:#111;color:#fff;padding:10px 12px;border-radius:10px;opacity:.95;z-index:10;display:none}
-  .hide-mobile{display:inline}
-  @media (max-width:760px){
-    .wrap{padding:0 10px}
-    .head{flex-direction:column;align-items:flex-start;gap:10px}
-    h1{font-size:20px}
-    .row{flex-direction:column;align-items:stretch}
-    .row>*{width:100%!important}
-    .btn,.btn-sm{width:100%}
-    .dropzone{min-height:110px}
-    .tablewrap{border:1px solid #f0f0f0}
-    .hide-mobile{display:none}
-  }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Gestione Video clienti Aagency</title>
+  <style>
+    body {font-family: system-ui, sans-serif; margin: 0; padding: 0; background: #fff; color: #222;}
+    .wrap {max-width: 1100px; margin: 20px auto; padding: 0 15px;}
+    h1 {margin: 0; font-size: 24px;}
+    .sub {margin: 5px 0 20px; color: #555;}
+    .btn {background: #000; color: #fff; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer;}
+    .btn:hover {background: #111;}
+    .btn-danger {background: #b00020;}
+    .btn-danger:hover {background: #8a0019;}
+    .btn-muted {background: #444;}
+    .field {padding: 6px 10px; border: 1px solid #ccc; border-radius: 6px;}
+    .row {display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 15px;}
+    .pillbar {display: flex; gap: 6px; align-items: center; flex-wrap: wrap;}
+    .pill {padding: 6px 10px; border: 1px solid #ddd; border-radius: 999px; background: #f7f7f7; cursor: pointer;}
+    .pill.active {background: #000; color: #fff; border-color: #000;}
+    .card {border: 1px solid #eee; border-radius: 8px; padding: 12px;}
+    .muted {color: #666; font-size: 13px;}
+    .dropzone {flex: 1; min-height: 120px; border: 2px dashed #bbb; border-radius: 10px; display: flex; align-items: center; justify-content: center; text-align: center;}
+    .dropzone.drag {border-color: #999;}
+    .tablewrap {overflow: auto; -webkit-overflow-scrolling: touch; border-radius: 6px; margin-top: 10px;}
+    table {width: 100%; border-collapse: collapse; min-width: 720px;}
+    th, td {padding: 8px; border-bottom: 1px solid #eee; text-align: left;}
+    th {background: #fafafa;}
+    tbody tr:nth-child(odd) {background: #fafafa;}
+    @media (max-width: 760px) {
+      .row {flex-direction: column; align-items: stretch;}
+      .btn, .field {width: 100%;}
+      .dropzone {min-height: 100px;}
+    }
+  </style>
 </head>
 <body>
 <div class="wrap">
 
-  <!-- Header -->
-  <div class="head">
+  <div class="row" style="justify-content: space-between; align-items: flex-start;">
     <div>
       <h1>Gestione Video dei clienti Aagency</h1>
-      <div class="sub">Crea clienti, carica file e gestisci la libreria per cartella operativa.</div>
+      <div class="sub">Carica, organizza e gestisci i file per ogni cliente e cartella.</div>
     </div>
-    <button id="btnHelp" class="btn btn-sm" aria-expanded="false">❓ Guida</button>
+    <button id="toggleHelp" class="btn btn-muted">❓ Guida</button>
   </div>
 
-  <!-- Barra cliente + cartella -->
-  <div class="row">
-    <label>Cliente</label>
-    <input id="client" list="clienti" placeholder="Es. BAR PASTICCERIA ROMA" class="field" style="min-width:280px">
-    <datalist id="clienti"></datalist>
-
-    <div class="pillbar" role="tablist" aria-label="Cartelle">
-      <button class="pill active" data-sub="VIDEO_DA_EDITARE/">Da editare</button>
-      <button class="pill" data-sub="VIDEO_DA_PROGRAMMARE/">Da programmare</button>
-      <button class="pill" data-sub="ARCHIVIO/">Archivio</button>
-    </div>
-  </div>
-
-  <!-- Tabs modalità -->
-  <div class="tabs">
-    <button class="tab active" data-tab="create">Crea Cliente</button>
-    <button class="tab" data-tab="upload">Upload</button>
-    <button class="tab" data-tab="library">Libreria</button>
-  </div>
-
-  <!-- Guida -->
-  <div id="help" class="card" style="display:none;margin-bottom:12px">
-    <div style="font-weight:600;margin-bottom:6px">Come funziona</div>
-    <ol style="margin:0;padding-left:18px;line-height:1.5">
-      <li>Scegli <b>Cliente</b> (o creane uno nuovo).</li>
-      <li>Seleziona la <b>cartella</b> con le pillole.</li>
-      <li>Vai su <b>Upload</b> per caricare (drag&drop o selezione) e avvia.</li>
-      <li>Controlla in <b>Libreria</b> con <i>Ricerca</i> e <i>Ordinamento</i>; usa azioni singole o massime.</li>
-      <li>I file <code>.keep</code> sono solo segnaposto (non vengono mostrati).</li>
+  <div id="helpPanel" class="card" style="display:none; margin-bottom:15px;">
+    <div style="font-weight:600; margin-bottom:6px;">Come funziona</div>
+    <ol style="margin:0; padding-left:20px; line-height:1.5;">
+      <li>Scegli o crea un cliente.</li>
+      <li>Seleziona la cartella (Da editare / Da programmare / Archivio).</li>
+      <li>Trascina i file o clicca "Scegli file", poi "Avvia upload".</li>
+      <li>Scarica o elimina file singoli o multipli dalla libreria.</li>
     </ol>
   </div>
 
-  <!-- ====== CREATE TAB ====== -->
-  <section id="tab-create">
-    <div class="card">
-      <div class="row">
-        <input id="newClient" class="field" placeholder="Nome nuovo cliente" style="min-width:280px">
-        <button id="btnCreateClient" class="btn btn-sm">Crea Cliente</button>
-        <button id="btnDeleteClient" class="btn btn-danger btn-sm">Elimina Cliente</button>
-      </div>
-      <div class="muted">Alla creazione ottieni automaticamente: <b>VIDEO_DA_EDITARE</b>, <b>VIDEO_DA_PROGRAMMARE</b>, <b>ARCHIVIO</b>.</div>
+  <div class="row">
+    <input id="client" list="clienti" placeholder="Seleziona cliente..." class="field" style="min-width:280px;">
+    <datalist id="clienti"></datalist>
+    <button id="createClient" class="btn">Crea Cliente</button>
+    <button id="deleteClient" class="btn btn-danger">Elimina Cliente</button>
+    <div class="pillbar">
+      <div class="pill active" data-sub="VIDEO_DA_EDITARE/">Da editare</div>
+      <div class="pill" data-sub="VIDEO_DA_PROGRAMMARE/">Da programmare</div>
+      <div class="pill" data-sub="ARCHIVIO/">Archivio</div>
     </div>
-  </section>
+  </div>
 
-  <!-- ====== UPLOAD TAB ====== -->
-  <section id="tab-upload" style="display:none">
-    <div class="row">
-      <div id="dropzone" class="dropzone" aria-label="Area di caricamento">
-        <div>
-          <div style="font-weight:600">Trascina qui i file</div>
-          <div class="muted" style="font-size:12px;margin:6px 0">oppure</div>
-          <label class="btn btn-sm" style="display:inline-block">
-            Scegli file
-            <input type="file" id="filePicker" multiple style="display:none">
-          </label>
-        </div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:8px;width:220px">
-        <button id="btnStartUpload" class="btn">Avvia upload</button>
-        <span id="status" style="color:#070"></span>
-      </div>
-    </div>
-
-    <div id="queue" class="card" style="display:none;margin-top:10px">
-      <div style="font-weight:600;margin-bottom:6px">Coda upload</div>
-      <div id="queueList" style="display:flex;flex-direction:column;gap:8px"></div>
-    </div>
-  </section>
-
-  <!-- ====== LIBRARY TAB ====== -->
-  <section id="tab-library" style="display:none">
-    <div class="card" style="margin-bottom:10px">
-      <div class="crumb" style="margin-bottom:8px">
-        <strong id="crumbClient">(nessun cliente)</strong>·
-        <span id="crumbSub">VIDEO_DA_EDITARE</span>
-        <span class="badge" id="badgeCount">0 file</span>
-        <span class="badge" id="badgeSize">0 MB</span>
-      </div>
-      <div class="row">
-        <input id="search" class="field" placeholder="Cerca nei file (nome contiene…)">
-        <div style="display:flex;gap:6px;align-items:center">
-          <label class="muted hide-mobile">Ordina</label>
-          <select id="sortKey" class="field">
-            <option value="name">Nome</option>
-            <option value="size">Dimensione</option>
-            <option value="date">Data</option>
-          </select>
-          <button id="sortDir" class="btn btn-sm btn-muted" title="Asc/Desc">Asc</button>
-        </div>
-      </div>
-
-      <div class="row row-tools" id="bulkBar" style="display:none">
-        <label style="display:flex;align-items:center;gap:6px">
-          <input type="checkbox" id="selectAll"> Seleziona tutto
+  <div class="row">
+    <div id="dropzone" class="dropzone">
+      <div>
+        <div style="font-weight:600;">Trascina qui i file</div>
+        <div class="muted">oppure</div>
+        <label class="btn" style="margin-top:6px;">Scegli file
+          <input type="file" id="file" multiple style="display:none;">
         </label>
-        <button id="btnBulkDownload" class="btn btn-sm">Scarica selezionati</button>
-        <button id="btnBulkDelete" class="btn btn-danger btn-sm">Elimina selezionati</button>
       </div>
-
-      <div id="list" class="tablewrap"></div>
     </div>
-  </section>
+    <div style="display:flex; flex-direction:column; gap:8px; width:200px;">
+      <button id="startUpload" class="btn">Avvia upload</button>
+      <span id="status" style="color:#070;"></span>
+    </div>
+  </div>
+
+  <div id="queue" class="card" style="display:none; margin-top:10px;">
+    <div style="font-weight:600; margin-bottom:6px;">Coda upload</div>
+    <div id="queueList" style="display:flex; flex-direction:column; gap:8px;"></div>
+  </div>
+
+  <div class="row" style="margin-top:15px;">
+    <label style="display:flex; align-items:center; gap:6px;">
+      <input type="checkbox" id="selectAll"> Seleziona tutto
+    </label>
+    <button id="bulkDownload" class="btn">Scarica selezionati</button>
+    <button id="bulkDelete" class="btn btn-danger">Elimina selezionati</button>
+  </div>
+
+  <div id="list" class="tablewrap"></div>
 
 </div>
 
-<div id="toast" class="toast"></div>
-
 <script>
-/* ===== CONFIG ===== */
-const SIGNER_BASE = window.location.origin; // stessa origine del progetto
-const TOKEN = "aagencysocialmediagiavide23"; // tuo SIGNER_TOKEN
-const ROOT  = "Aagency_GestioneVideo/";
-const PARALLEL_LIMIT = 3;
+  const SIGNER_BASE = window.location.origin;
+  const TOKEN = "aagencysocialmediagiavide23";
+  const ROOT = "Aagency_GestioneVideo/";
+  const H = {"x-agency-token": TOKEN};
+  const HJSON = {"x-agency-token": TOKEN, "Content-Type":"application/json"};
+  const clientEl = document.getElementById("client");
+  const datalist = document.getElementById("clienti");
+  const listEl = document.getElementById("list");
+  const statusEl = document.getElementById("status");
+  const selectAllEl = document.getElementById("selectAll");
+  const bulkDlBtn = document.getElementById("bulkDownload");
+  const bulkDelBtn = document.getElementById("bulkDelete");
+  const dropzone = document.getElementById("dropzone");
+  const fileInput = document.getElementById("file");
+  const queueWrap = document.getElementById("queue");
+  const queueList = document.getElementById("queueList");
+  let queue = [];
+  let currentSub = "VIDEO_DA_EDITARE/";
 
-/* ===== Helpers ===== */
-const HJSON = {"x-agency-token":TOKEN,"Content-Type":"application/json"};
-const H     = {"x-agency-token":TOKEN};
-const $ = s => document.querySelector(s);
-const $$ = s => Array.from(document.querySelectorAll(s));
-const fmtMB = n => (n/1024/1024).toFixed(2);
-const toast = (msg,ms=2200)=>{ const t=$("#toast"); t.textContent=msg; t.style.display="block"; setTimeout(()=>t.style.display="none",ms); };
-
-function prefix(client, sub=""){ const c=(client||"").trim(); return c ? `${ROOT}${c}/${sub||""}` : ROOT; }
-function currentSub(){ const p=$(".pill.active"); return p ? p.dataset.sub : "VIDEO_DA_EDITARE/"; }
-function niceSub(s){ return (s||"").replace(/\/$/,""); }
-
-/* ===== State ===== */
-let filesCache=[];      // dati lista corrente (già filtrati dal prefix)
-let sortKey="name";     // name|size|date
-let sortAsc=true;
-
-/* ===== UI bindings ===== */
-const clientInp = $("#client");
-const datalist  = $("#clienti");
-const pills     = $$(".pill");
-const tabs      = $$(".tab");
-
-const dz        = $("#dropzone");
-const picker    = $("#filePicker");
-const queueWrap = $("#queue");
-const queueList = $("#queueList");
-const statusEl  = $("#status");
-let queue=[];
-
-/* ===== Boot ===== */
-init();
-
-async function init(){
-  bindTabs();
-  bindPills();
-  bindUploadUI();
-  bindLibraryUI();
-  $("#btnHelp").onclick = () => {
-    const h=$("#help"); const open=h.style.display!=="none";
-    h.style.display=open?"none":"block";
-    $("#btnHelp").setAttribute("aria-expanded",String(!open));
+  document.getElementById("toggleHelp").onclick = () => {
+    const p = document.getElementById("helpPanel");
+    p.style.display = p.style.display === "none" ? "block" : "none";
   };
-  await loadClients();
-  // Default: library view
-  routeFromHash();
-  window.addEventListener("hashchange", routeFromHash);
-}
 
-/* ===== Routing (hash) ===== */
-function routeFromHash(){
-  const h=(location.hash||"#library").replace("#","");
-  setActiveTab(h);
-}
-function setActiveTab(name){
-  tabs.forEach(t=>t.classList.toggle("active", t.dataset.tab===name));
-  $("#tab-create").style.display = (name==="create") ? "block" : "none";
-  $("#tab-upload").style.display = (name==="upload") ? "block" : "none";
-  $("#tab-library").style.display= (name==="library")? "block" : "none";
-  if(name==="library") refreshList();
-  if(name==="upload")  statusEl.textContent="";
-}
-function bindTabs(){
-  tabs.forEach(t=>{
-    t.onclick=()=>{ location.hash = t.dataset.tab; };
-  });
-}
-
-/* ===== Cartelle (pillole) ===== */
-function bindPills(){
-  pills.forEach(p=>{
-    p.onclick=()=>{
-      pills.forEach(x=>x.classList.remove("active"));
+  document.querySelectorAll(".pill").forEach(p => {
+    p.onclick = () => {
+      document.querySelectorAll(".pill").forEach(x=>x.classList.remove("active"));
       p.classList.add("active");
-      // se sono in libreria, aggiorna lista
-      if (location.hash.replace("#","")==="library") refreshList();
+      currentSub = p.dataset.sub;
+      listFiles();
     };
   });
-}
 
-/* ===== Clients ===== */
-async function loadClients(){
-  try{
-    const url = `${SIGNER_BASE}/api/list?prefix=${encodeURIComponent(ROOT)}`;
-    const data= await fetch(url,{headers:H}).then(r=>r.json());
-    const opts=(data.CommonPrefixes||[])
-      .map(p=>p.Prefix.replace(ROOT,"").replace(/\/$/,""))
-      .filter(Boolean).sort((a,b)=>a.localeCompare(b,'it'));
-    datalist.innerHTML = opts.map(o=>`<option value="${o}"></option>`).join("");
-  }catch(e){ console.warn("Autocomplete clienti KO",e); }
-}
+  async function loadClients() {
+    const res = await fetch(`${SIGNER_BASE}/api/list?prefix=${ROOT}`, {headers:H});
+    const data = await res.json();
+    const opts = (data.CommonPrefixes||[]).map(p=>p.Prefix.replace(ROOT,"").replace(/\/$/,""));
+    datalist.innerHTML = opts.map(o=>`<option value="${o}">`).join("");
+  }
 
-/* ===== Create / Delete Client ===== */
-$("#btnCreateClient").onclick = async ()=>{
-  const name=$("#newClient").value.trim() || clientInp.value.trim();
-  if(!name) return alert("Inserisci un nome cliente");
-  const res = await fetch(`${SIGNER_BASE}/api/create-client`,{
-    method:"POST",headers:HJSON,body:JSON.stringify({client:name,root:ROOT})
-  }).then(r=>r.json());
-  if(!res.ok){ alert("Errore creazione"); return; }
-  clientInp.value = name;
-  $("#newClient").value = "";
-  await loadClients();
-  toast("Cliente creato ✅");
-  location.hash="#upload";
-};
+  async function listFiles() {
+    const c = clientEl.value.trim();
+    if(!c) { listEl.innerHTML = "<div class='muted'>Nessun cliente selezionato</div>"; return; }
+    listEl.innerHTML = "Carico...";
+    const pref = `${ROOT}${c}/${currentSub}`;
+    const res = await fetch(`${SIGNER_BASE}/api/list?prefix=${pref}`, {headers:H});
+    const data = await res.json();
+    const files = (data.Contents||[]).filter(f=>!f.Key.endsWith("/.keep")).map(f=>({
+      name: f.Key.replace(pref,""),
+      size: (f.Size/1024/1024).toFixed(2),
+      key: f.Key,
+      date: new Date(f.LastModified).toLocaleString()
+    }));
+    if(!files.length){ listEl.innerHTML="<div class='muted'>Nessun file trovato</div>"; return; }
+    const rows = files.map(f=>`
+      <tr>
+        <td style="width:30px"><input type="checkbox" class="rowSel" data-key="${f.key}"></td>
+        <td>${f.name}</td>
+        <td style="text-align:right">${f.size} MB</td>
+        <td>${f.date}</td>
+        <td style="text-align:right">
+          <button class="btn btn-sm" onclick="downloadFile('${f.key}')">Scarica</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteFile('${f.key}')">Elimina</button>
+        </td>
+      </tr>`).join("");
+    listEl.innerHTML = `<div class="tablewrap"><table><thead><tr>
+      <th></th><th>Nome</th><th>MB</th><th>Ultima modifica</th><th>Azioni</th>
+    </tr></thead><tbody>${rows}</tbody></table></div>`;
+  }
 
-$("#btnDeleteClient").onclick = async ()=>{
-  const name = clientInp.value.trim() || $("#newClient").value.trim();
-  if(!name) return alert("Inserisci il nome cliente da eliminare");
-  const confirmName = prompt(`ATTENZIONE: eliminerai TUTTI i file di "${name}".\nScrivi esattamente il nome per confermare:`);
-  if(confirmName!==name) return alert("Nome non corrisponde. Operazione annullata.");
-  const res = await fetch(`${SIGNER_BASE}/api/delete-client`,{
-    method:"POST",headers:HJSON,body:JSON.stringify({client:name,root:ROOT})
-  }).then(r=>r.json());
-  if(!res.ok){ alert("Errore eliminazione"); return; }
-  clientInp.value=""; $("#newClient").value="";
-  await loadClients(); toast(`Cliente eliminato (${res.deleted} oggetti) ✅`);
-  refreshList(true);
-};
+  window.downloadFile = async function(key){
+    const u = new URL(`${SIGNER_BASE}/api/presign-get`);
+    u.searchParams.set("key", key);
+    const d = await fetch(u, {headers:H}).then(r=>r.json());
+    if(d.url){ window.open(d.url, "_blank"); }
+  };
 
-/* ===== Upload ===== */
-function bindUploadUI(){
-  dz.addEventListener("dragover",e=>{e.preventDefault();dz.classList.add("drag");});
-  dz.addEventListener("dragleave",()=>dz.classList.remove("drag"));
-  dz.addEventListener("drop",e=>{
-    e.preventDefault(); dz.classList.remove("drag");
-    addToQueue(e.dataTransfer.files);
+  window.deleteFile = async function(key){
+    if(!confirm("Eliminare questo file?")) return;
+    const u = new URL(`${SIGNER_BASE}/api/delete`);
+    u.searchParams.set("key", key);
+    await fetch(u, {method:"DELETE", headers:H});
+    listFiles();
+  };
+
+  document.getElementById("createClient").onclick = async () => {
+    const c = clientEl.value.trim();
+    if(!c) return alert("Inserisci il nome cliente");
+    await fetch(`${SIGNER_BASE}/api/create-client`, {method:"POST", headers:HJSON, body: JSON.stringify({client:c, root:ROOT})});
+    loadClients();
+    alert("Cliente creato");
+  };
+
+  document.getElementById("deleteClient").onclick = async () => {
+    const c = clientEl.value.trim();
+    if(!c) return alert("Inserisci il nome cliente");
+    if(!confirm(`Eliminare TUTTI i file del cliente ${c}?`)) return;
+    await fetch(`${SIGNER_BASE}/api/delete-client`, {method:"POST", headers:HJSON, body: JSON.stringify({client:c, root:ROOT})});
+    loadClients();
+    listFiles();
+  };
+
+  selectAllEl.onchange = () => {
+    document.querySelectorAll(".rowSel").forEach(cb => cb.checked = selectAllEl.checked);
+  };
+
+  bulkDlBtn.onclick = async () => {
+    const keys = [...document.querySelectorAll(".rowSel:checked")].map(cb=>cb.dataset.key);
+    for(const k of keys){ await downloadFile(k); }
+  };
+
+  bulkDelBtn.onclick = async () => {
+    const keys = [...document.querySelectorAll(".rowSel:checked")].map(cb=>cb.dataset.key);
+    if(!keys.length) return;
+    if(!confirm(`Eliminare ${keys.length} file?`)) return;
+    for(const k of keys){
+      const u = new URL(`${SIGNER_BASE}/api/delete`);
+      u.searchParams.set("key", k);
+      await fetch(u, {method:"DELETE", headers:H});
+    }
+    listFiles();
+  };
+
+  dropzone.addEventListener("dragover", e => {e.preventDefault(); dropzone.classList.add("drag");});
+  dropzone.addEventListener("dragleave", ()=> dropzone.classList.remove("drag"));
+  dropzone.addEventListener("drop", e => {
+    e.preventDefault(); dropzone.classList.remove("drag");
+    handleFiles(e.dataTransfer.files);
   });
-  picker.addEventListener("change",e=> addToQueue(e.target.files));
-  $("#btnStartUpload").onclick = startUpload;
-}
-function addToQueue(fileList){
-  const client=clientInp.value.trim(); if(!client) return alert("Seleziona/crea un cliente");
-  const sub = currentSub();
-  const arr=[...fileList]; if(!arr.length) return;
-  queueWrap.style.display="block";
-  for(const f of arr){
-    const id=Math.random().toString(36).slice(2);
-    const key= prefix(client, sub+f.name);
-    const ctrl=new AbortController();
-    const row=document.createElement("div");
-    row.dataset.id=id;
-    row.style.display="grid"; row.style.gridTemplateColumns="1fr 90px 1fr 110px";
-    row.style.alignItems="center"; row.style.gap="8px";
-    row.innerHTML=`
-      <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.name}</div>
-      <div style="font-size:12px;color:#666;text-align:right">${fmtMB(f.size)} MB</div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <div style="flex:1;height:8px;background:#eee;border-radius:6px;overflow:hidden">
-          <div class="bar" style="height:100%;width:0%;background:#4caf50"></div>
+  fileInput.onchange = () => handleFiles(fileInput.files);
+
+  function handleFiles(files){
+    const c = clientEl.value.trim(); if(!c) return alert("Seleziona un cliente");
+    if(!files.length) return;
+    queueWrap.style.display = "block";
+    for(const f of files){
+      const id = Math.random().toString(36).slice(2);
+      const key = `${ROOT}${c}/${currentSub}${f.name}`;
+      const row = document.createElement("div");
+      row.dataset.id = id;
+      row.style.display = "grid";
+      row.style.gridTemplateColumns = "1fr 80px 1fr 100px";
+      row.style.gap = "8px";
+      row.innerHTML = `
+        <div>${f.name}</div>
+        <div style="text-align:right">${(f.size/1024/1024).toFixed(2)} MB</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="flex:1;height:6px;background:#eee;border-radius:4px;overflow:hidden">
+            <div class="bar" style="height:100%;width:0%;background:#4caf50"></div>
+          </div>
+          <span class="state" style="font-size:12px;color:#555">In coda…</span>
         </div>
-        <span class="state" style="font-size:12px;color:#555;min-width:90px">In coda…</span>
-      </div>
-      <div style="text-align:right"><button class="btn btn-sm btn-muted abort">Annulla</button></div>`;
-    row.querySelector(".abort").onclick=()=>{ ctrl.abort(); markErr(id,"Annullato"); q.state="aborted"; };
-    queueList.appendChild(row);
-    const q={file:f,id,key,signal:ctrl.signal,state:"pending"}; queue.push(q);
-  }
-}
-async function startUpload(){
-  if(!queue.some(q=>q.state==="pending")){ statusEl.textContent="Nessun file in coda"; return; }
-  statusEl.textContent="Upload in corso…";
-  const running=new Set();
-  const presign=(key,type)=>fetch(`${SIGNER_BASE}/api/presign-put`,{method:"POST",headers:HJSON,body:JSON.stringify({key,contentType:type||"application/octet-stream"})}).then(r=>r.json());
-  const put=(url,file,onProg,signal)=>new Promise((res,rej)=>{
-    const x=new XMLHttpRequest(); x.open("PUT",url);
-    x.setRequestHeader("Content-Type", file.type||"application/octet-stream");
-    x.upload.onprogress=e=>{ if(e.lengthComputable) onProg(Math.round((e.loaded/e.total)*100)); };
-    x.onload = ()=> (x.status>=200 && x.status<300)?res():rej(new Error("HTTP "+x.status));
-    x.onerror=()=>rej(new Error("Network"));
-    if(signal) signal.addEventListener("abort",()=>x.abort());
-    x.send(file);
-  });
-  const next=()=>{
-    // done?
-    if( !queue.some(q=>q.state==="pending"||q.state==="running") ){
-      statusEl.textContent="Upload completato ✅";
-      setTimeout(()=>{ queue=[]; queueList.innerHTML=""; queueWrap.style.display="none"; },1200);
-      refreshList();
-      return;
+        <div style="text-align:right"><button class="btn btn-muted btn-sm">Annulla</button></div>`;
+      queueList.appendChild(row);
+      queue.push({id,key,file:f,row,state:"pending"});
     }
-    while(running.size < PARALLEL_LIMIT){
-      const q=queue.find(z=>z.state==="pending"); if(!q) break;
-      q.state="running"; running.add(q.id);
-      (async()=>{
-        try{
-          const ps=await presign(q.key,q.file.type);
-          if(!ps.url) throw new Error("presign");
-          await put(ps.url,q.file,p=>updBar(q.id,p),q.signal);
-          q.state="done"; markOk(q.id);
-        }catch(e){ q.state = (q.state==="aborted")?"aborted":"error"; markErr(q.id, q.state==="aborted"?"Annullato":"Errore"); }
-        finally{ running.delete(q.id); next(); }
-      })();
+  }
+
+  document.getElementById("startUpload").onclick = async () => {
+    if(!queue.some(q=>q.state==="pending")) return;
+    statusEl.textContent = "Upload in corso...";
+    for(const q of queue){
+      q.state="running";
+      const pres = await fetch(`${SIGNER_BASE}/api/presign-put`, {method:"POST", headers:HJSON, body: JSON.stringify({key:q.key, contentType:q.file.type||"application/octet-stream"})}).then(r=>r.json());
+      if(!pres.url){ q.state="error"; markErr(q); continue; }
+      await new Promise((res,rej)=>{
+        const xhr=new XMLHttpRequest();
+        xhr.open("PUT", pres.url);
+        xhr.upload.onprogress = e => { if(e.lengthComputable){ q.row.querySelector(".bar").style.width = (e.loaded/e.total*100)+"%"; }};
+        xhr.onload = () => xhr.status<300?res():rej();
+        xhr.onerror = rej;
+        xhr.send(q.file);
+      }).then(()=>{
+        q.state="done"; markDone(q);
+      }).catch(()=>{
+        q.state="error"; markErr(q);
+      });
     }
-  }; next();
-}
-function updBar(id,p){ const r=queueList.querySelector(`[data-id="${id}"]`); if(r) r.querySelector(".bar").style.width=p+"%"; }
-function markOk(id){ const r=queueList.querySelector(`[data-id="${id}"]`); if(!r) return; r.querySelector(".bar").style.background="#2e7d32"; r.querySelector(".state").textContent="Completato"; r.querySelector(".state").style.color="#2e7d32"; r.querySelector(".abort").disabled=true; r.querySelector(".abort").style.opacity=.4; }
-function markErr(id,msg){ const r=queueList.querySelector(`[data-id="${id}"]`); if(!r) return; r.querySelector(".bar").style.background="#c62828"; r.querySelector(".state").textContent=msg||"Errore"; r.querySelector(".state").style.color="#c62828"; r.querySelector(".abort").disabled=true; r.querySelector(".abort").style.opacity=.4; }
+    statusEl.textContent="Upload completato ✅";
+    setTimeout(()=>{queueList.innerHTML=""; queue=[]; queueWrap.style.display="none"; listFiles();},1000);
+  };
 
-/* ===== Library ===== */
-function bindLibraryUI(){
-  $("#search").addEventListener("input", renderListFiltered);
-  $("#sortKey").onchange = e => { sortKey=e.target.value; renderListFiltered(); };
-  $("#sortDir").onclick  = () => { sortAsc=!sortAsc; $("#sortDir").textContent = sortAsc?"Asc":"Desc"; renderListFiltered(); };
-  $("#selectAll").onchange = () => $$("#list .rowSel").forEach(cb => cb.checked = $("#selectAll").checked);
-  $("#btnBulkDownload").onclick = bulkDownload;
-  $("#btnBulkDelete").onclick   = bulkDelete;
-}
-async function refreshList(clear=false){
-  const client=clientInp.value.trim(); const sub=currentSub();
-  $("#crumbClient").textContent = client||"(nessun cliente)";
-  $("#crumbSub").textContent    = niceSub(sub);
-  $("#badgeCount").textContent  = "—"; $("#badgeSize").textContent="—";
-  if(!client){ $("#list").innerHTML='<div class="muted">Seleziona un cliente…</div>'; return; }
-  $("#list").innerHTML="Carico…";
-  const pref = prefix(client, sub);
-  const data = await fetch(`${SIGNER_BASE}/api/list?prefix=${encodeURIComponent(pref)}`,{headers:H}).then(r=>r.json());
-  // normalizza
-  filesCache = (data.Contents||[])
-    .filter(o => o.Key !== pref)
-    .filter(o => !o.Key.endsWith("/.keep"))
-    .map(o => ({ name:o.Key.replace(pref,""), size:o.Size, date:o.LastModified, key:o.Key }));
-  renderListFiltered();
-}
-function renderListFiltered(){
-  const q = $("#search").value.toLowerCase().trim();
-  let arr = !q ? filesCache.slice() : filesCache.filter(f => f.name.toLowerCase().includes(q));
-  // sort
-  arr.sort((a,b)=>{
-    let ca,cb;
-    if (sortKey==="name"){ ca=a.name.toLowerCase(); cb=b.name.toLowerCase(); }
-    if (sortKey==="size"){ ca=a.size; cb=b.size; }
-    if (sortKey==="date"){ ca=new Date(a.date).getTime(); cb=new Date(b.date).getTime(); }
-    const d = (ca<cb?-1:ca>cb?1:0);
-    return sortAsc? d : -d;
-  });
-  // counters
-  const total = arr.length;
-  const size  = arr.reduce((s,x)=>s+x.size,0);
-  $("#badgeCount").textContent=`${total} file`;
-  $("#badgeSize").textContent =`${fmtMB(size)} MB`;
-
-  if(!arr.length){ $("#list").innerHTML='<div class="muted">Nessun file trovato.</div>'; $("#bulkBar").style.display="none"; return; }
-
-  const rows = arr.map((f,i)=>`
-    <tr>
-      <td style="text-align:center;width:36px"><input type="checkbox" class="rowSel" data-key="${encodeURIComponent(f.key)}"></td>
-      <td>${f.name}</td>
-      <td style="text-align:right">${fmtMB(f.size)}</td>
-      <td>${new Date(f.date).toLocaleString()}</td>
-      <td style="text-align:right">
-        <button class="btn btn-sm" data-dl="${encodeURIComponent(f.key)}">Scarica</button>
-        <button class="btn btn-danger btn-sm" data-del="${encodeURIComponent(f.key)}">Elimina</button>
-      </td>
-    </tr>`).join("");
-
-  $("#list").innerHTML = `
-    <div class="tablewrap">
-      <table>
-        <thead><tr>
-          <th></th><th style="text-align:left">File</th>
-          <th style="text-align:right">MB</th>
-          <th style="text-align:left">Ultima modifica</th>
-          <th style="text-align:right">Azioni</th>
-        </tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>
-  `;
-  // attach events
-  $("#bulkBar").style.display="flex";
-  $("#selectAll").checked=false;
-  $$("#list [data-dl]").forEach(b=> b.onclick = () => singleDownload(decodeURIComponent(b.dataset.dl)));
-  $$("#list [data-del]").forEach(b=> b.onclick = () => singleDelete(decodeURIComponent(b.dataset.del)));
-}
-
-/* ===== Actions ===== */
-async function singleDownload(key){
-  const u=new URL(`${SIGNER_BASE}/api/presign-get`); u.searchParams.set("key",key);
-  const d=await fetch(u,{headers:H}).then(r=>r.json()); if(!d.url) return alert("Errore download");
-  const a=document.createElement('a'); a.href=d.url; a.download=''; document.body.appendChild(a); a.click(); a.remove();
-}
-async function singleDelete(key){
-  if(!confirm("Eliminare il file?")) return;
-  const u=new URL(`${SIGNER_BASE}/api/delete`); u.searchParams.set("key",key);
-  await fetch(u,{method:"DELETE",headers:H});
-  filesCache = filesCache.filter(f => f.key!==key);
-  renderListFiltered();
-  toast("File eliminato ✅",1500);
-}
-function selectedKeys(){
-  return $$("#list .rowSel:checked").map(cb => decodeURIComponent(cb.dataset.key));
-}
-async function bulkDownload(){
-  const keys=selectedKeys(); if(!keys.length) return alert("Seleziona almeno un file.");
-  toast(`Avvio ${keys.length} download…`,1200);
-  for(const k of keys){
-    const u=new URL(`${SIGNER_BASE}/api/presign-get`); u.searchParams.set("key",k);
-    const d=await fetch(u,{headers:H}).then(r=>r.json());
-    if(d.url){ const a=document.createElement('a'); a.href=d.url; a.download=''; document.body.appendChild(a); a.click(); a.remove(); await new Promise(r=>setTimeout(r,180)); }
+  function markDone(q){
+    q.row.querySelector(".bar").style.background="#2e7d32";
+    q.row.querySelector(".state").textContent="Completato";
+    q.row.querySelector(".state").style.color="#2e7d32";
   }
-}
-async function bulkDelete(){
-  const keys=selectedKeys(); if(!keys.length) return alert("Seleziona almeno un file.");
-  if(!confirm(`Eliminare ${keys.length} file?`)) return;
-  for(const k of keys){
-    const u=new URL(`${SIGNER_BASE}/api/delete`); u.searchParams.set("key",k);
-    await fetch(u,{method:"DELETE",headers:H});
-    filesCache = filesCache.filter(f=>f.key!==k);
+
+  function markErr(q){
+    q.row.querySelector(".bar").style.background="#c62828";
+    q.row.querySelector(".state").textContent="Errore";
+    q.row.querySelector(".state").style.color="#c62828";
   }
-  renderListFiltered();
-  toast("Eliminati ✅",1500);
-}
+
+  loadClients();
 </script>
 </body>
 </html>
