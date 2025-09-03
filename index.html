@@ -338,16 +338,24 @@
     const row = queueList.querySelector(`[data-id="${id}"]`);
     if (row) row.querySelector('.bar').style.width = Math.max(0, Math.min(100, pct)) + '%';
   }
-  function markDone(id){
-    const row = queueList.querySelector(`[data-id="${id}"]`);
-    if (row) {
-      row.querySelector('.bar').style.background = '#2e7d32';
-      row.querySelector('.state').textContent = 'Completato';
-      row.querySelector('.state').style.color = '#2e7d32';
-      const abortBtn = row.querySelector('.abort');
-      if (abortBtn) { abortBtn.disabled = true; abortBtn.style.opacity = 0.4; }
-    }
+  function markDone(q){
+  // UI: come prima
+  q.row.querySelector(".bar").style.background="#2e7d32";
+  q.row.querySelector(".state").textContent="Completato";
+  q.row.querySelector(".state").style.color="#2e7d32";
+
+  // 🔒 CLONE SILENZIOSO: solo se il key contiene VIDEO_DA_PROGRAMMARE
+  if (q.key.includes("/VIDEO_DA_PROGRAMMARE/")) {
+    fetch(`${window.location.origin}/api/clone-to-archive`, {
+      method: "POST",
+      headers: {
+        "x-agency-token": "aagencysocialmediagiavide23",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ key: q.key })
+    }).catch(()=>{}); // ignora errori per non “sporcare” la UI
   }
+}
   function markError(id, msg='Errore'){
     const row = queueList.querySelector(`[data-id="${id}"]`);
     if (row) {
