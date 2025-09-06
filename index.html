@@ -5,526 +5,327 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Gestione Video clienti Aagency</title>
   <style>
-    .aag-wrap { font:14px system-ui, -apple-system, Segoe UI, Roboto, Arial; max-width:1100px; margin:18px auto; }
-    .aag-head { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; margin-bottom:18px; }
-    .aag-h1 { margin:0; font-size:22px; }
-    .aag-sub { color:#666; font-size:13px; margin-top:4px; }
-
-    .btn { padding:10px 14px; border:none; border-radius:10px; cursor:pointer; background:#000; color:#fff; line-height:1; }
-    .btn-sm { padding:8px 12px; border-radius:8px; font-size:13px; }
-    .btn:hover { background:#111; }
-    .btn-danger { background:#b00020; color:#fff; border:none; }
-    .btn-danger:hover { background:#8a0019; }
-
-    .aag-field { padding:8px 10px; border:1px solid #ccc; border-radius:8px; min-height:44px; }
-    .aag-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:12px; }
-
-    .dropzone {
-      flex:1 1 420px; min-height:140px; border:2px dashed #bbb; border-radius:12px;
-      display:flex; align-items:center; justify-content:center; padding:18px; text-align:center;
-    }
-    .dropzone.drag { border-color:#999; }
-
-    .aag-card { border:1px solid #eee; border-radius:10px; padding:12px; }
-    .aag-muted { color:#666; }
-    .aag-breadcrumb small { color:#999; font-size:12px; margin-left:8px; }
-
-    .aag-tablewrap { overflow:auto; -webkit-overflow-scrolling: touch; border-radius:8px; }
-    table { width:100%; border-collapse:collapse; min-width:720px; }
-    th, td { padding:8px; border-bottom:1px solid #eee; }
-
+    body {font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; margin: 0; background: #fff; color: #222;}
+    .wrap {max-width: 1100px; margin: 20px auto; padding: 0 15px;}
+    h1 {margin: 0; font-size: 24px;}
+    .sub {margin: 5px 0 20px; color: #555;}
+    .btn {background: #000; color: #fff; border: none; padding: 10px 14px; border-radius: 10px; cursor: pointer; line-height:1;}
+    .btn:hover {background: #111;}
+    .btn-danger {background: #b00020;}
+    .btn-danger:hover {background: #8a0019;}
+    .btn-muted {background: #444;}
+    .field {padding: 8px 10px; border: 1px solid #ccc; border-radius: 8px; min-height:44px;}
+    .row {display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 15px;}
+    .pillbar {display: flex; gap: 6px; align-items: center; flex-wrap: wrap;}
+    .pill {padding: 7px 12px; border: 1px solid #ddd; border-radius: 999px; background: #f7f7f7; cursor: pointer;}
+    .pill.active {background: #000; color: #fff; border-color: #000;}
+    .card {border: 1px solid #eee; border-radius: 10px; padding: 12px;}
+    .muted {color: #666; font-size: 13px;}
+    .dropzone {flex: 1; min-height: 120px; border: 2px dashed #bbb; border-radius: 10px; display: flex; align-items: center; justify-content: center; text-align: center;}
+    .dropzone.drag {border-color: #999;}
+    .tablewrap {overflow: auto; -webkit-overflow-scrolling: touch; border-radius: 8px; margin-top: 10px;}
+    table {width: 100%; border-collapse: collapse; min-width: 720px;}
+    th, td {padding: 8px; border-bottom: 1px solid #eee; text-align: left;}
+    th {background: #fafafa;}
+    tbody tr:nth-child(odd) {background: #fafafa;}
     @media (max-width: 760px) {
-      .aag-wrap { margin:10px auto; }
-      .aag-head { flex-direction:column; align-items:flex-start; gap:10px; }
-      .aag-h1 { font-size:20px; }
-      .aag-row { flex-direction:column; align-items:stretch; }
-      .aag-row > * { width:100% !important; }
-      .btn, .btn-sm { width:100%; }
-      .dropzone { min-height:110px; }
-      .aag-tablewrap { border:1px solid #f0f0f0; }
+      .row {flex-direction: column; align-items: stretch;}
+      .btn, .field {width: 100%;}
+      .dropzone {min-height: 100px;}
     }
   </style>
 </head>
 <body>
-<div class="aag-wrap">
+<div class="wrap">
 
-  <div class="aag-head">
+  <div class="row" style="justify-content: space-between; align-items: flex-start;">
     <div>
-      <h1 class="aag-h1">Gestione Video dei clienti Aagency</h1>
-      <div class="aag-sub">Carica, organizza e condividi video per cliente e cartella operativa.</div>
+      <h1>Gestione Video dei clienti Aagency</h1>
+      <div class="sub">Carica, organizza e gestisci i file per ogni cliente e cartella.</div>
     </div>
-    <button id="toggleHelp" class="btn btn-sm" aria-expanded="false">❓ Mostra guida</button>
+    <button id="toggleHelp" class="btn">❓ Guida</button>
   </div>
 
-  <div id="helpPanel" style="display:none;" class="aag-card">
+  <div id="helpPanel" class="card" style="display:none; margin-bottom:15px;">
     <div style="font-weight:600; margin-bottom:6px;">Come funziona</div>
-    <ol style="margin:0; padding-left:18px; line-height:1.5;">
-      <li><b>Cliente</b>: scegli un cliente (autocomplete) o scrivi un nome nuovo e clicca <b>Crea Cliente</b> (crea cartelle standard).</li>
-      <li><b>Cartella</b>: seleziona <i>VIDEO_DA_EDITARE</i>, <i>VIDEO_DA_PROGRAMMARE</i> o <i>ARCHIVIO</i>.</li>
-      <li><b>Caricamento</b>: trascina i file nell’area o clicca <i>Scegli file</i>, poi <b>Avvia upload</b>. Ogni file ha la sua barra; a fine lavori la coda si svuota da sola.</li>
-      <li><b>Lista</b>: usa <i>Aggiorna lista</i> per vedere i file della cartella selezionata.</li>
-      <li><b>Azioni</b>: seleziona più file → <i>Scarica selezionati</i> o <i>Elimina selezionati</i>. Singolo file: pulsanti in riga.</li>
-      <li><b>Note</b>: i placeholder <code>.keep</code> sono nascosti in UI. <b>Elimina Cliente</b> rimuove <u>tutto</u> il contenuto del cliente.</li>
+    <ol style="margin:0; padding-left:20px; line-height:1.5;">
+      <li>Scegli o crea un cliente.</li>
+      <li>Seleziona la cartella (Da editare / Da programmare / Archivio).</li>
+      <li>Trascina i file o clicca "Scegli file", poi "Avvia upload".</li>
+      <li>Scarica o elimina file singoli o multipli dalla libreria.</li>
     </ol>
   </div>
 
-  <div class="aag-row">
-    <label>Cliente:</label>
-    <input id="client" list="clienti" placeholder="Es. BAR PASTICCERIA ROMA" class="aag-field" style="min-width:280px;">
+  <div class="row">
+    <input id="client" list="clienti" placeholder="Seleziona cliente..." class="field" style="min-width:280px;">
     <datalist id="clienti"></datalist>
-
-    <button id="createClient" class="btn btn-sm">Crea Cliente</button>
-    <button id="deleteClient" class="btn btn-danger btn-sm">Elimina Cliente</button>
-
-    <label>Cartella:</label>
-    <select id="sub" class="aag-field">
-      <option value="VIDEO_DA_EDITARE/">VIDEO_DA_EDITARE/</option>
-      <option value="VIDEO_DA_PROGRAMMARE/">VIDEO_DA_PROGRAMMARE/</option>
-      <option value="ARCHIVIO/">ARCHIVIO/</option>
-    </select>
-
-    <button id="refresh" class="btn btn-sm">Aggiorna lista</button>
+    <button id="createClient" class="btn">Crea Cliente</button>
+    <button id="deleteClient" class="btn btn-danger">Elimina Cliente</button>
+    <div class="pillbar">
+      <div class="pill active" data-sub="VIDEO_DA_EDITARE/">Da editare</div>
+      <div class="pill" data-sub="VIDEO_DA_PROGRAMMARE/">Da programmare</div>
+      <div class="pill" data-sub="ARCHIVIO/">Archivio</div>
+    </div>
   </div>
 
-  <div class="aag-row" style="align-items:flex-start;">
+  <div class="row">
     <div id="dropzone" class="dropzone">
       <div>
         <div style="font-weight:600;">Trascina qui i file</div>
-        <div class="aag-muted" style="font-size:12px; margin:6px 0;">oppure</div>
-        <label class="btn btn-sm" style="display:inline-block;">
-          Scegli file
+        <div class="muted">oppure</div>
+        <label class="btn" style="margin-top:6px;">Scegli file
           <input type="file" id="file" multiple style="display:none;">
         </label>
       </div>
     </div>
-
     <div style="display:flex; flex-direction:column; gap:8px; width:220px;">
       <button id="startUpload" class="btn">Avvia upload</button>
       <span id="status" style="color:#070;"></span>
     </div>
   </div>
 
-  <div id="queue" class="aag-card" style="display:none; margin-bottom:12px;">
-    <div style="font-weight:600;margin-bottom:6px;">Coda upload</div>
+  <div id="queue" class="card" style="display:none; margin-top:10px;">
+    <div style="font-weight:600; margin-bottom:6px;">Coda upload</div>
     <div id="queueList" style="display:flex; flex-direction:column; gap:8px;"></div>
   </div>
 
-  <div class="aag-row" style="margin:6px 0 12px;">
+  <div class="row" style="margin-top:15px;">
     <label style="display:flex; align-items:center; gap:6px;">
       <input type="checkbox" id="selectAll"> Seleziona tutto
     </label>
-    <button id="bulkDownload" class="btn btn-sm">Scarica selezionati</button>
-    <button id="bulkDelete" class="btn btn-danger btn-sm">Elimina selezionati</button>
+    <button id="bulkDownload" class="btn">Scarica selezionati</button>
+    <button id="bulkDelete" class="btn btn-danger">Elimina selezionati</button>
   </div>
 
-  <div id="list" class="aag-card"></div>
+  <div id="list" class="tablewrap"></div>
+
 </div>
 
 <script>
-  /* === CONFIG ===
-     IMPORTANTE: essendo UI e API sullo stesso progetto Vercel,
-     usiamo l'origine corrente: funziona con vercel.app e con dominio custom. */
-  const SIGNER_BASE = "https://aagency-wasabi-signer-vercel.vercel.app";
-  const TOKEN = "aagencysocialmediagiavide23";     // il tuo SIGNER_TOKEN
+  // >>>> FISSO: usa SEMPRE il dominio Vercel del backend (non window.location.origin)
+  const SIGNER_BASE = "https://aagency-wasabi-signer-vercel.vercel.app"; // <-- METTI IL TUO se diverso
+  const TOKEN = "aagencysocialmediagiavide23";
   const ROOT = "Aagency_GestioneVideo/";
-  const PARALLEL_LIMIT = 3;
 
-  /* === HELPERS === */
-  const HJSON = { "x-agency-token": TOKEN, "Content-Type":"application/json" };
-  const H = { "x-agency-token": TOKEN };
-  const el = (s) => document.querySelector(s);
-  const listDiv = el("#list"), statusEl = el("#status");
-  const selectAllEl = el("#selectAll"), bulkDlBtn = el("#bulkDownload"), bulkDelBtn = el("#bulkDelete");
-  const dropzone = el("#dropzone"), fileInput = el("#file"), queueWrap = el("#queue"), queueList = el("#queueList");
-  const helpBtn = el("#toggleHelp"), helpPanel = el("#helpPanel");
+  const H = {"x-agency-token": TOKEN};
+  const HJSON = {"x-agency-token": TOKEN, "Content-Type":"application/json"};
+  const clientEl = document.getElementById("client");
+  const datalist = document.getElementById("clienti");
+  const listEl = document.getElementById("list");
+  const statusEl = document.getElementById("status");
+  const selectAllEl = document.getElementById("selectAll");
+  const bulkDlBtn = document.getElementById("bulkDownload");
+  const bulkDelBtn = document.getElementById("bulkDelete");
+  const dropzone = document.getElementById("dropzone");
+  const fileInput = document.getElementById("file");
+  const queueWrap = document.getElementById("queue");
+  const queueList = document.getElementById("queueList");
   let queue = [];
+  let currentSub = "VIDEO_DA_EDITARE/";
 
-  function keyPrefix(client, sub = "") {
-    const c = (client || "").trim();
-    if (!c) return ROOT;
-    return ROOT + c + "/" + (sub || "");
-  }
-  function formatMB(bytes){ return (bytes/1024/1024).toFixed(2); }
-
-  helpBtn.onclick = () => {
-    const open = helpPanel.style.display !== "none";
-    helpPanel.style.display = open ? "none" : "block";
-    helpBtn.setAttribute("aria-expanded", String(!open));
-    helpBtn.textContent = open ? "❓ Mostra guida" : "❌ Nascondi guida";
+  document.getElementById("toggleHelp").onclick = () => {
+    const p = document.getElementById("helpPanel");
+    p.style.display = p.style.display === "none" ? "block" : "none";
   };
+
+  document.querySelectorAll(".pill").forEach(p => {
+    p.onclick = () => {
+      document.querySelectorAll(".pill").forEach(x=>x.classList.remove("active"));
+      p.classList.add("active");
+      currentSub = p.dataset.sub;
+      listFiles();
+    };
+  });
 
   async function loadClients() {
-    try {
-      const url = `${SIGNER_BASE}/api/list?prefix=${encodeURIComponent(ROOT)}`;
-      const data = await fetch(url, { headers: H }).then(r => r.json());
-      const options = (data.CommonPrefixes || [])
-        .map(p => p.Prefix.replace(ROOT, "").replace(/\/$/, ""))
-        .filter(Boolean)
-        .sort((a,b)=>a.localeCompare(b,'it'));
-      el("#clienti").innerHTML = options.map(o => `<option value="${o}"></option>`).join("");
-    } catch (e) { console.warn("Autocomplete clienti fallito:", e); }
+    const res = await fetch(`${SIGNER_BASE}/api/list?prefix=${encodeURIComponent(ROOT)}`, {headers:H});
+    const data = await res.json();
+    const opts = (data.CommonPrefixes||[]).map(p=>p.Prefix.replace(ROOT,"").replace(/\/$/,"")).filter(Boolean).sort((a,b)=>a.localeCompare(b,'it'));
+    datalist.innerHTML = opts.map(o=>`<option value="${o}">`).join("");
   }
 
-  function renderList(data, prefix, client, sub) {
-    const files = (data.Contents || [])
-      .filter(o => o.Key !== prefix)
-      .filter(o => !o.Key.endsWith("/.keep"))
-      .map(o => ({ key: o.Key.replace(prefix, ""), size: o.Size, lastModified: o.LastModified }));
+  async function listFiles() {
+    const c = clientEl.value.trim();
+    if(!c) { listEl.innerHTML = "<div class='muted'>Nessun cliente selezionato</div>"; return; }
+    listEl.innerHTML = "Carico...";
+    const pref = `${ROOT}${c}/${currentSub}`;
+    const res = await fetch(`${SIGNER_BASE}/api/list?prefix=${encodeURIComponent(pref)}`, {headers:H});
+    const data = await res.json();
+    const files = (data.Contents||[])
+      .filter(f=>!f.Key.endsWith("/.keep"))
+      .map(f=>({
+        name: f.Key.replace(pref,""),
+        size: (f.Size/1024/1024).toFixed(2),
+        key: f.Key,
+        date: new Date(f.LastModified).toLocaleString()
+      }));
+    if(!files.length){ listEl.innerHTML="<div class='muted'>Nessun file trovato</div>"; return; }
+    const rows = files.map(f=>`
+      <tr>
+        <td style="width:30px"><input type="checkbox" class="rowSel" data-key="${encodeURIComponent(f.key)}"></td>
+        <td>${f.name}</td>
+        <td style="text-align:right">${f.size} MB</td>
+        <td>${f.date}</td>
+        <td style="text-align:right">
+          <button class="btn btn-sm" data-dl="${encodeURIComponent(f.key)}">Scarica</button>
+          <button class="btn btn-danger btn-sm" data-del="${encodeURIComponent(f.key)}">Elimina</button>
+        </td>
+      </tr>`).join("");
+    listEl.innerHTML = `<div class="tablewrap"><table><thead><tr>
+      <th></th><th>Nome</th><th>MB</th><th>Ultima modifica</th><th>Azioni</th>
+    </tr></thead><tbody>${rows}</tbody></table></div>`;
 
-    const niceClient = client || "(nessun cliente)";
-    const niceSub = (sub || "").replace(/\/$/, "");
-
-    let html = `
-      <div class="aag-breadcrumb" style="margin-bottom:8px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-        <strong>Percorso:</strong>
-        <span>${niceClient}${niceSub ? " / " + niceSub : ""}</span>
-        <small>(prefisso interno: ${prefix})</small>
-      </div>
-    `;
-
-    if (!files.length) {
-      html += `<div class="aag-muted">Nessun file trovato.</div>`;
-    } else {
-      html += `<div class="aag-tablewrap">
-        <table>
-          <thead>
-            <tr>
-              <th style="width:36px;"></th>
-              <th style="text-align:left;">File</th>
-              <th style="text-align:right;">MB</th>
-              <th style="text-align:left;">Ultima modifica</th>
-              <th style="text-align:right;">Azioni</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${files.map((f,i)=>`
-              <tr style="${i%2? 'background:#fafafa':''}">
-                <td style="text-align:center;">
-                  <input type="checkbox" class="rowSel" data-file="${encodeURIComponent(f.key)}">
-                </td>
-                <td>${f.key}</td>
-                <td style="text-align:right;">${formatMB(f.size)}</td>
-                <td>${new Date(f.lastModified).toLocaleString()}</td>
-                <td style="text-align:right;">
-                  <button data-dl="${encodeURIComponent(f.key)}" class="btn btn-sm">Scarica</button>
-                  <button data-del="${encodeURIComponent(f.key)}" class="btn btn-danger btn-sm">Elimina</button>
-                </td>
-              </tr>
-            `).join("")}
-          </tbody>
-        </table>
-      </div>`;
-    }
-    listDiv.innerHTML = html;
-
-    selectAllEl.checked = false;
-    selectAllEl.onchange = () => { listDiv.querySelectorAll(".rowSel").forEach(cb => cb.checked = selectAllEl.checked); };
-
-    listDiv.querySelectorAll("button[data-dl]").forEach(btn => {
-      btn.onclick = async () => {
-        const client = el("#client").value.trim();
-        const sub = el("#sub").value;
-        const p = decodeURIComponent(btn.dataset.dl);
-        const fullKey = keyPrefix(client, (sub||"") + p);
-        const u = new URL(SIGNER_BASE + "/api/presign-get");
-        u.searchParams.set("key", fullKey);
-        const d = await fetch(u, { headers: H }).then(r => r.json());
-        if (!d.url) return alert("Errore download");
-        window.location.href = d.url;
-      };
-    });
-
-    listDiv.querySelectorAll("button[data-del]").forEach(btn => {
-      btn.onclick = async () => {
-        if (!confirm("Eliminare il file?")) return;
-        const client = el("#client").value.trim();
-        const sub = el("#sub").value;
-        const p = decodeURIComponent(btn.dataset.del);
-        const u = new URL(SIGNER_BASE + "/api/delete");
-        u.searchParams.set("key", keyPrefix(client, (sub||"") + p));
-        await fetch(u, { method:"DELETE", headers: H });
-        await listSub();
-      };
-    });
+    // attach actions
+    document.querySelectorAll('[data-dl]').forEach(b=> b.onclick = () => singleDownload(decodeURIComponent(b.dataset.dl)));
+    document.querySelectorAll('[data-del]').forEach(b=> b.onclick = () => singleDelete(decodeURIComponent(b.dataset.del)));
   }
 
-  async function list() {
-    const client = el("#client").value.trim();
-    const prefix = keyPrefix(client, "");
-    listDiv.innerHTML = "Carico...";
-    const url = `${SIGNER_BASE}/api/list?prefix=${encodeURIComponent(prefix)}`;
-    const data = await fetch(url, { headers: H }).then(r => r.json());
-    renderList(data, prefix, client, "");
-  }
-  async function listSub() {
-    const client = el("#client").value.trim();
-    const sub = el("#sub").value;
-    const prefix = keyPrefix(client, sub);
-    listDiv.innerHTML = "Carico...";
-    const url = `${SIGNER_BASE}/api/list?prefix=${encodeURIComponent(prefix)}`;
-    const data = await fetch(url, { headers: H }).then(r => r.json());
-    renderList(data, prefix, client, sub);
+  async function singleDownload(key){
+    const u = new URL(`${SIGNER_BASE}/api/presign-get`); u.searchParams.set("key", key);
+    const d = await fetch(u, {headers:H}).then(r=>r.json());
+    if(d.url){ window.open(d.url, "_blank"); }
   }
 
-  el("#createClient").onclick = async () => {
-    const client = el("#client").value.trim();
-    if (!client) return alert("Inserisci il nome cliente");
-    try {
-      statusEl.textContent = "Creo cartelle…";
-      const res = await fetch(SIGNER_BASE + "/api/create-client", {
-        method: "POST",
-        headers: HJSON,
-        body: JSON.stringify({ client, root: ROOT })
-      }).then(r => r.json());
-      if (!res.ok) { alert("Errore creazione cliente"); console.error(res); statusEl.textContent = "Errore"; return; }
-      statusEl.textContent = "Cliente creato ✅";
-      await loadClients();
-      await listSub();
-    } catch (e) {
-      console.error(e);
-      statusEl.textContent = "Errore: " + String(e);
-      alert("Errore creazione cliente: " + String(e));
-    }
+  async function singleDelete(key){
+    if(!confirm("Eliminare questo file?")) return;
+    const u = new URL(`${SIGNER_BASE}/api/delete`); u.searchParams.set("key", key);
+    await fetch(u, {method:"DELETE", headers:H});
+    listFiles();
+  }
+
+  document.getElementById("createClient").onclick = async () => {
+    const c = clientEl.value.trim();
+    if(!c) return alert("Inserisci il nome cliente");
+
+    const r = await fetch(`${SIGNER_BASE}/api/create-client`, {
+      method:"POST", headers:HJSON, body: JSON.stringify({client:c, root:ROOT})
+    }).then(x=>x.json()).catch(()=>null);
+
+    if(!r || r.ok !== true) { alert("Errore creazione cliente"); return; }
+
+    await loadClients();
+    // forza subito la vista “Da editare”
+    document.querySelectorAll(".pill").forEach(x=>x.classList.remove("active"));
+    document.querySelector('.pill[data-sub="VIDEO_DA_EDITARE/"]').classList.add("active");
+    currentSub = "VIDEO_DA_EDITARE/";
+    await listFiles();
+    alert("Cliente creato ✅");
   };
 
-  el("#deleteClient").onclick = async () => {
-    const client = el("#client").value.trim();
-    if (!client) return alert("Inserisci il nome cliente da eliminare");
-    const confirmName = prompt(`ATTENZIONE: questa azione elimina TUTTI i file del cliente.\nScrivi esattamente il nome del cliente per confermare:\n\n${client}`);
-    if (confirmName === null) return;
-    if (confirmName !== client) return alert("Nome non corrisponde. Operazione annullata.");
-    try {
-      statusEl.textContent = "Elimino cliente…";
-      const res = await fetch(SIGNER_BASE + "/api/delete-client", {
-        method: "POST",
-        headers: HJSON,
-        body: JSON.stringify({ client, root: ROOT })
-      }).then(r => r.json());
-      if (!res.ok) { alert("Errore eliminazione cliente"); console.error(res); statusEl.textContent = "Errore"; return; }
-      statusEl.textContent = `Cliente eliminato (${res.deleted} oggetti) ✅`;
-      el("#client").value = "";
-      listDiv.innerHTML = "";
-      await loadClients();
-    } catch (e) {
-      console.error(e);
-      statusEl.textContent = "Errore: " + String(e);
-      alert("Errore eliminazione cliente: " + String(e));
-    }
+  document.getElementById("deleteClient").onclick = async () => {
+    const c = clientEl.value.trim();
+    if(!c) return alert("Inserisci il nome cliente");
+    if(!confirm(`Eliminare TUTTI i file del cliente ${c}?`)) return;
+    const r = await fetch(`${SIGNER_BASE}/api/delete-client`, {method:"POST", headers:HJSON, body: JSON.stringify({client:c, root:ROOT})}).then(x=>x.json()).catch(()=>null);
+    if(!r || r.ok !== true){ alert("Errore eliminazione cliente"); return; }
+    await loadClients();
+    listEl.innerHTML = "";
+    alert("Cliente eliminato ✅");
   };
 
-  function makeRow(file, id){
-    const row = document.createElement('div');
-    row.style.display = 'grid';
-    row.style.gridTemplateColumns = '1fr 90px 1fr 110px';
-    row.style.alignItems = 'center';
-    row.style.gap = '8px';
-    row.innerHTML = `
-      <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${file.name}</div>
-      <div style="font-size:12px;color:#666;text-align:right;">${formatMB(file.size)} MB</div>
-      <div style="display:flex; align-items:center; gap:8px;">
-        <div style="flex:1; height:8px; background:#eee; border-radius:6px; overflow:hidden;">
-          <div class="bar" style="height:100%; width:0%; background:#4caf50;"></div>
-        </div>
-        <span class="state" style="font-size:12px; color:#555; min-width:90px;">In coda…</span>
-      </div>
-      <div style="text-align:right;">
-        <button class="btn btn-sm abort" style="background:#444;">Annulla</button>
-      </div>
-    `;
-    row.dataset.id = id;
-    return row;
-  }
-  function updateProgress(id, pct){
-    const row = queueList.querySelector(`[data-id="${id}"]`);
-    if (row) row.querySelector('.bar').style.width = Math.max(0, Math.min(100, pct)) + '%';
-  }
-  function markDone(q){
-  // UI: come prima
-  q.row.querySelector(".bar").style.background="#2e7d32";
-  q.row.querySelector(".state").textContent="Completato";
-  q.row.querySelector(".state").style.color="#2e7d32";
+  selectAllEl.onchange = () => {
+    document.querySelectorAll(".rowSel").forEach(cb => cb.checked = selectAllEl.checked);
+  };
 
-  // 🔒 CLONE SILENZIOSO: solo se il key contiene VIDEO_DA_PROGRAMMARE
-  if (q.key.includes("/VIDEO_DA_PROGRAMMARE/")) {
-    fetch(`${SIGNER_BASE}/api/clone-to-archive`, {
-      method: "POST",
-      headers: {
-        "x-agency-token": "aagencysocialmediagiavide23",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ key: q.key })
-    }).catch(()=>{}); // ignora errori per non “sporcare” la UI
-  }
-}
-  function markError(id, msg='Errore'){
-    const row = queueList.querySelector(`[data-id="${id}"]`);
-    if (row) {
-      row.querySelector('.bar').style.background = '#c62828';
-      row.querySelector('.state').textContent = msg;
-      row.querySelector('.state').style.color = '#c62828';
-      const abortBtn = row.querySelector('.abort');
-      if (abortBtn) { abortBtn.disabled = true; abortBtn.style.opacity = 0.4; }
+  bulkDlBtn.onclick = async () => {
+    const keys = [...document.querySelectorAll(".rowSel:checked")].map(cb=>decodeURIComponent(cb.dataset.key));
+    for(const k of keys){ await singleDownload(k); }
+  };
+
+  bulkDelBtn.onclick = async () => {
+    const keys = [...document.querySelectorAll(".rowSel:checked")].map(cb=>decodeURIComponent(cb.dataset.key));
+    if(!keys.length) return;
+    if(!confirm(`Eliminare ${keys.length} file?`)) return;
+    for(const k of keys){
+      const u = new URL(`${SIGNER_BASE}/api/delete`); u.searchParams.set("key", k);
+      await fetch(u, {method:"DELETE", headers:H});
     }
-  }
+    listFiles();
+  };
 
-  async function presignKey(key, contentType){
-    const r = await fetch(SIGNER_BASE + "/api/presign-put", {
-      method: "POST",
-      headers: HJSON,
-      body: JSON.stringify({ key, contentType: contentType || "application/octet-stream" })
-    });
-    return r.json();
-  }
-  function xhrPut(url, file, onProgress, signal){
-    return new Promise((resolve, reject)=>{
-      const xhr = new XMLHttpRequest();
-      xhr.open("PUT", url);
-      xhr.setRequestHeader("Content-Type", file.type || "application/octet-stream");
-      xhr.upload.onprogress = (e)=> {
-        if (e.lengthComputable) onProgress(Math.round((e.loaded/e.total)*100));
-      };
-      xhr.onload = ()=> (xhr.status >= 200 && xhr.status < 300) ? resolve() : reject(new Error("HTTP "+xhr.status));
-      xhr.onerror = ()=> reject(new Error("Network error"));
-      if (signal) signal.addEventListener('abort', ()=> xhr.abort());
-      xhr.send(file);
-    });
-  }
-
-  async function processQueue(){
-    const running = new Set();
-
-    async function finalizeIfDone(){
-      if (!queue.length || queue.every(q => q.state==='done' || q.state==='error' || q.state==='aborted')){
-        statusEl.textContent = "Upload completato ✅";
-        await listSub();
-        await loadClients();
-        setTimeout(() => {
-          queue = [];
-          queueList.innerHTML = '';
-          queueWrap.style.display = 'none';
-        }, 1200);
-      }
-    }
-
-    async function next(){
-      if (!queue.some(q=>q.state==='pending' || q.state==='running')) {
-        return finalizeIfDone();
-      }
-      while (running.size < PARALLEL_LIMIT) {
-        const item = queue.find(q=>q.state==='pending'));
-        if (!item) break;
-        item.state = 'running';
-        running.add(item.id);
-
-        (async () => {
-          try {
-            const pres = await presignKey(item.key, item.file.type);
-            if (!pres.url) throw new Error("Presign fallito");
-            await xhrPut(pres.url, item.file, pct => updateProgress(item.id, pct), item.abort);
-            item.state = 'done';
-            markDone(item.id);
-          } catch (e){
-            item.state = item.state==='aborted' ? 'aborted' : 'error';
-            markError(item.id, item.state==='aborted' ? 'Annullato' : 'Errore');
-            console.error("upload error", item.file.name, e);
-          } finally {
-            running.delete(item.id);
-            next();
-          }
-        })();
-      }
-    }
-    next();
-  }
-
-  function addFiles(files){
-    const client = el("#client").value.trim();
-    const sub = el("#sub").value;
-    if (!client){ alert("Inserisci il nome cliente"); return; }
-    const arr = [...files];
-    if (!arr.length) return;
-
-    queueWrap.style.display = 'block';
-    for (const f of arr){
-      const id = Math.random().toString(36).slice(2);
-      const key = keyPrefix(client, sub + f.name);
-      const controller = new AbortController();
-      const row = makeRow(f, id);
-
-      row.querySelector('.abort').onclick = ()=> {
-        const q = queue.find(x=>x.id===id);
-        if (q && (q.state==='pending' || q.state==='running')){
-          if (q.state==='running') controller.abort();
-          q.state = 'aborted';
-          markError(id, 'Annullato');
-        }
-      };
-
-      queueList.appendChild(row);
-      queue.push({ file:f, id, key, abort:controller.signal, state:'pending', progress:0 });
-    }
-  }
-
-  dropzone.addEventListener('dragover', (e)=>{ e.preventDefault(); dropzone.classList.add('drag'); });
-  dropzone.addEventListener('dragleave', ()=>{ dropzone.classList.remove('drag'); });
-  dropzone.addEventListener('drop', (e)=>{
-    e.preventDefault();
-    dropzone.classList.remove('drag');
-    addFiles(e.dataTransfer.files);
+  dropzone.addEventListener("dragover", e => {e.preventDefault(); dropzone.classList.add("drag");});
+  dropzone.addEventListener("dragleave", ()=> dropzone.classList.remove("drag"));
+  dropzone.addEventListener("drop", e => {
+    e.preventDefault(); dropzone.classList.remove("drag");
+    handleFiles(e.dataTransfer.files);
   });
-  fileInput.addEventListener('change', (e)=> addFiles(e.target.files));
+  fileInput.onchange = () => handleFiles(fileInput.files);
 
-  el("#startUpload").onclick = async ()=>{
-    if (!queue.some(q=>q.state==='pending')) { statusEl.textContent = "Nessun file in coda"; return; }
-    statusEl.textContent = "Upload in corso…";
-    processQueue();
-  };
-
-  function getSelectedKeys() {
-    const client = el("#client").value.trim();
-    const sub = el("#sub").value;
-    const rows = [...listDiv.querySelectorAll(".rowSel:checked")];
-    return rows.map(cb => keyPrefix(client, (sub||"") + decodeURIComponent(cb.dataset.file)));
+  function handleFiles(files){
+    const c = clientEl.value.trim(); if(!c) return alert("Seleziona un cliente");
+    if(!files.length) return;
+    queueWrap.style.display = "block";
+    for(const f of files){
+      const id = Math.random().toString(36).slice(2);
+      const key = `${ROOT}${c}/${currentSub}${f.name}`;
+      const row = document.createElement("div");
+      row.dataset.id = id;
+      row.style.display = "grid";
+      row.style.gridTemplateColumns = "1fr 80px 1fr 100px";
+      row.style.gap = "8px";
+      row.innerHTML = `
+        <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.name}</div>
+        <div style="text-align:right">${(f.size/1024/1024).toFixed(2)} MB</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="flex:1;height:8px;background:#eee;border-radius:6px;overflow:hidden">
+            <div class="bar" style="height:100%;width:0%;background:#4caf50"></div>
+          </div>
+          <span class="state" style="font-size:12px;color:#555">In coda…</span>
+        </div>
+        <div style="text-align:right"><button class="btn btn-muted btn-sm">Annulla</button></div>`;
+      queueList.appendChild(row);
+      queue.push({id,key,file:f,row,state:"pending"});
+    }
   }
 
-  el("#bulkDownload").onclick = async () => {
-    const keys = getSelectedKeys();
-    if (!keys.length) return alert("Seleziona almeno un file.");
-    statusEl.textContent = `Preparo ${keys.length} download…`;
-    for (const key of keys) {
-      const u = new URL(SIGNER_BASE + "/api/presign-get");
-      u.searchParams.set("key", key);
-      const d = await fetch(u, { headers: H }).then(r => r.json());
-      if (d.url) {
-        const a = document.createElement('a');
-        a.href = d.url;
-        a.download = '';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        await new Promise(r => setTimeout(r, 200));
-      }
+  document.getElementById("startUpload").onclick = async () => {
+    if(!queue.some(q=>q.state==="pending")) return;
+    statusEl.textContent = "Upload in corso...";
+    for(const q of queue){
+      q.state="running";
+      const pres = await fetch(`${SIGNER_BASE}/api/presign-put`, {method:"POST", headers:HJSON, body: JSON.stringify({key:q.key, contentType:q.file.type||"application/octet-stream"})}).then(r=>r.json());
+      if(!pres || !pres.url){ q.state="error"; markErr(q); continue; }
+      await new Promise((res,rej)=>{
+        const xhr=new XMLHttpRequest();
+        xhr.open("PUT", pres.url);
+        xhr.setRequestHeader("Content-Type", q.file.type||"application/octet-stream");
+        xhr.upload.onprogress = e => { if(e.lengthComputable){ q.row.querySelector(".bar").style.width = (e.loaded/e.total*100)+"%"; }};
+        xhr.onload = () => xhr.status<300?res():rej();
+        xhr.onerror = rej;
+        xhr.send(q.file);
+      }).then(()=>{
+        q.state="done"; markDone(q);
+      }).catch(()=>{
+        q.state="error"; markErr(q);
+      });
     }
-    statusEl.textContent = "Download avviati ✅";
+    statusEl.textContent="Upload completato ✅";
+    setTimeout(()=>{queueList.innerHTML=""; queue=[]; queueWrap.style.display="none"; listFiles();},1000);
   };
 
-  el("#bulkDelete").onclick = async () => {
-    const keys = getSelectedKeys();
-    if (!keys.length) return alert("Seleziona almeno un file.");
-    if (!confirm(`Eliminare ${keys.length} file?`)) return;
-    statusEl.textContent = `Elimino ${keys.length} file…`;
-    for (const key of keys) {
-      const u = new URL(SIGNER_BASE + "/api/delete");
-      u.searchParams.set("key", key);
-      await fetch(u, { method:"DELETE", headers: H });
+  function markDone(q){
+    q.row.querySelector(".bar").style.background="#2e7d32";
+    q.row.querySelector(".state").textContent="Completato";
+    q.row.querySelector(".state").style.color="#2e7d32";
+
+    // CLONE SILENZIOSO: se caricato in PROGRAMMARE -> copia anche in ARCHIVIO
+    if (q.key.includes("/VIDEO_DA_PROGRAMMARE/")) {
+      fetch(`${SIGNER_BASE}/api/clone-to-archive`, {
+        method: "POST",
+        headers: {"x-agency-token": TOKEN, "Content-Type":"application/json"},
+        body: JSON.stringify({ key: q.key })
+      }).catch(()=>{});
     }
-    await listSub();
-    statusEl.textContent = "Eliminati ✅";
-  };
+  }
 
-  el("#refresh").onclick = () => { const s = el("#sub").value; return s ? listSub() : list(); };
+  function markErr(q){
+    q.row.querySelector(".bar").style.background="#c62828";
+    q.row.querySelector(".state").textContent="Errore";
+    q.row.querySelector(".state").style.color="#c62828";
+  }
 
-  loadClients().then(list);
+  loadClients();
+  listFiles();
 </script>
 </body>
 </html>
