@@ -12,12 +12,21 @@ export function makeS3() {
     },
   });
 }
+
 export const BUCKET = process.env.WASABI_BUCKET;
 export const ROOT_PREFIX = process.env.ROOT_PREFIX || "Aagency_GestioneVideo/";
+
+// accetta sia x-agency-token sia x-aagency-token (typo storico)
 export function assertAuth(req, res) {
-  const token = req.headers["x-agency-token"];
+  const h = req.headers || {};
+  const token =
+    h["x-agency-token"] ||
+    h["x-aagency-token"] || // tolleranza
+    h["X-Agency-Token"] ||  // in caso arrivasse capitalizzato
+    h["X-Aagency-Token"];
+
   if (!token || token !== process.env.SIGNER_TOKEN) {
-    res.status(401).json({ ok:false, error:"UNAUTHORIZED" });
+    res.status(401).json({ ok: false, error: "UNAUTHORIZED" });
     return false;
   }
   return true;
