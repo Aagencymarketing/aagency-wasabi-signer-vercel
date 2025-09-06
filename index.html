@@ -124,7 +124,7 @@
   /* === CONFIG ===
      IMPORTANTE: essendo UI e API sullo stesso progetto Vercel,
      usiamo l'origine corrente: funziona con vercel.app e con dominio custom. */
-  const SIGNER_BASE = window.location.origin;
+  const SIGNER_BASE = "https://aagency-wasabi-signer-vercel.vercel.app";
   const TOKEN = "aagencysocialmediagiavide23";     // il tuo SIGNER_TOKEN
   const ROOT = "Aagency_GestioneVideo/";
   const PARALLEL_LIMIT = 3;
@@ -346,7 +346,7 @@
 
   // 🔒 CLONE SILENZIOSO: solo se il key contiene VIDEO_DA_PROGRAMMARE
   if (q.key.includes("/VIDEO_DA_PROGRAMMARE/")) {
-    fetch(`${window.location.origin}/api/clone-to-archive`, {
+    fetch(`${SIGNER_BASE}/api/clone-to-archive`, {
       method: "POST",
       headers: {
         "x-agency-token": "aagencysocialmediagiavide23",
