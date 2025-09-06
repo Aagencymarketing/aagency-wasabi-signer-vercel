@@ -1,3 +1,4 @@
+// api/_s3.js
 import { S3Client } from "@aws-sdk/client-s3";
 
 export function makeS3() {
@@ -24,7 +25,7 @@ export function assertAuth(req, res) {
     h["X-Aagency-Token"];
 
   if (!token || token !== process.env.SIGNER_TOKEN) {
-    res.status(401).json({ ok:false, error:"UNAUTHORIZED" });
+    res.status(401).json({ ok: false, error: "UNAUTHORIZED" });
     return false;
   }
   return true;
