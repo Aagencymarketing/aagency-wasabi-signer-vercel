@@ -1,66 +1,33 @@
-// /api/delete-client.js
-import {
-  ListObjectsV2Command,
-  DeleteObjectsCommand
-} from "@aws-sdk/client-s3";
-import { s3, WASABI_BUCKET, SIGNER_TOKEN } from "../s3.mjs";
+// api/delete-client.js
+import { withCORS } from "./_cors";
+import { makeS3, BUCKET, ROOT_PREFIX, assertAuth } from "./_s3";
+import { ListObjectsV2Command, DeleteObjectsCommand } from "@aws-sdk/client-s3";
 
-function setCORS(res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, x-agency-token");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
-}
-function ensureAuth(req, res) {
-  const token = req.headers["x-agency-token"];
-  if (!token || token !== SIGNER_TOKEN) {
-    res.statusCode = 401;
-    res.setHeader("content-type", "application/json");
-    res.end(JSON.stringify({ error: "unauthorized" }));
-    return false;
-  }
-  return true;
-}
+export default withCORS(async function handler(req,res){
+  try{
+    if(req.method!=="POST") return res.status(405).json({ok:false});
+    if(!assertAuth(req,res)) return;
 
-export default async function handler(req, res) {
-  setCORS(res);
-  if (req.method === "OPTIONS") { res.statusCode = 204; return res.end(); }
-  if (req.method !== "POST") { res.statusCode = 405; return res.end(JSON.stringify({ error: "method not allowed" })); }
-  if (!ensureAuth(req, res)) return;
+    const { client, root } = req.body || {};
+    if(!client) return res.status(400).json({ ok:false, error:"MISSING_CLIENT" });
 
-  try {
-    const chunks = [];
-    for await (const ch of req) chunks.push(ch);
-    const body = JSON.parse(Buffer.concat(chunks).toString() || "{}");
+    const prefix = (root || ROOT_PREFIX) + client.trim() + "/";
+    const s3 = makeS3();
+    let deleted = 0, ContinuationToken;
 
-    const root = (body.root || "Aagency_GestioneVideo/").trim();
-    const client = (body.client || "").trim();
-    if (!client) { res.statusCode = 400; return res.end(JSON.stringify({ error: "client required" })); }
-
-    const prefix = `${root}${client}/`;
-
-    let deleted = 0;
-    let token;
-    do {
-      const list = await s3.send(new ListObjectsV2Command({
-        Bucket: WASABI_BUCKET,
-        Prefix: prefix,
-        ContinuationToken: token
-      }));
-      const objs = (list.Contents || []).map(o => ({ Key: o.Key }));
-      if (objs.length) {
-        const out = await s3.send(new DeleteObjectsCommand({
-          Bucket: WASABI_BUCKET,
-          Delete: { Objects: objs, Quiet: true }
-        }));
-        deleted += (out.Deleted || []).length;
+    do{
+      const page = await s3.send(new ListObjectsV2Command({ Bucket: BUCKET, Prefix: prefix, ContinuationToken }));
+      const objs = (page.Contents || []).map(o=>({ Key:o.Key }));
+      if(objs.length){
+        await s3.send(new DeleteObjectsCommand({ Bucket: BUCKET, Delete: { Objects: objs } }));
+        deleted += objs.length;
       }
-      token = list.IsTruncated ? list.NextContinuationToken : undefined;
-    } while (token);
+      ContinuationToken = page.IsTruncated ? page.NextContinuationToken : undefined;
+    } while (ContinuationToken);
 
-    res.setHeader("content-type", "application/json");
-    res.end(JSON.stringify({ ok: true, client, deleted }));
-  } catch (e) {
-    res.statusCode = 500;
-    res.end(JSON.stringify({ error: String(e) }));
+    res.status(200).json({ ok:true, deleted });
+  }catch(e){
+    console.error("delete-client error", e);
+    res.status(500).json({ ok:false, error:"DELETE_CLIENT_FAILED" });
   }
-}
+});
