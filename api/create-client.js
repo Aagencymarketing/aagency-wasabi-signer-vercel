@@ -1,72 +1,69 @@
-// api/create-client.js
 import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { withCORS } from "./_cors.js";
-import { makeS3, BUCKET, ROOT_PREFIX, assertAuth } from "./_s3.js";
+import { s3, bucket, rootPrefix } from "../s3.mjs";
 
-function sanitize(name) {
-  return String(name || "")
-    .trim()
-    .replace(/[\/\\]+/g, " ")
-    .replace(/\s+/g, " ")
-    .replace(/[^\w\s\-\.\,\&\(\)]/g, "");
+// CORS inline (niente più import esterni)
+function applyCORS(req, res) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, x-agency-token");
+  if (req.method === "OPTIONS") {
+    res.status(200).end();
+    return true;
+  }
+  return false;
 }
 
-function ensureSlash(p) {
-  if (!p) return "";
-  return p.endsWith("/") ? p : p + "/";
+function getNameFromReq(req) {
+  try {
+    if (req.method === "POST" && req.body && typeof req.body === "object") {
+      if (req.body.name) return String(req.body.name).trim();
+      if (req.body.client) return String(req.body.client).trim();
+    }
+  } catch (_) {}
+  const { name, client } = req.query || {};
+  return String(name || client || "").trim();
 }
 
-export default withCORS(async function handler(req, res) {
-  if (req.method !== "POST") {
-    res.status(405).json({ ok: false, error: "METHOD_NOT_ALLOWED" });
-    return;
-  }
-
-  if (!assertAuth(req, res)) return;
-
-  // body può arrivare come JSON o stringa
-  let body = {};
-  try { body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : (req.body || {}); }
-  catch { body = {}; }
-
-  const clientRaw = body.client;
-  const root = ensureSlash(body.root || ROOT_PREFIX);
-  const client = sanitize(clientRaw);
-
-  if (!client) {
-    res.status(400).json({ ok: false, error: "INVALID_CLIENT" });
-    return;
-  }
-
-  const base = `${root}${client}/`;
-  const folders = ["VIDEO_DA_EDITARE/", "VIDEO_DA_PROGRAMMARE/", "ARCHIVIO/"];
-
-  const s3 = makeS3();
+export default async function handler(req, res) {
+  if (applyCORS(req, res)) return;
 
   try {
-    await Promise.all(
-      folders.map((sub) =>
-        s3.send(new PutObjectCommand({
-          Bucket: BUCKET,
-          Key: `${base}${sub}.keep`, // crea il "folder" con segnaposto
+    if (req.method !== "POST" && req.method !== "GET") {
+      res.status(405).json({ ok: false, error: "METHOD_NOT_ALLOWED" });
+      return;
+    }
+
+    const raw = getNameFromReq(req);
+    if (!raw) {
+      res.status(400).json({ ok: false, error: "NAME_REQUIRED" });
+      return;
+    }
+
+    // normalizzazione semplice: trims e collapse spazi
+    const name = raw.replace(/\s+/g, " ").trim();
+    const base = `${rootPrefix}${name}/`;
+    const folders = ["VIDEO_DA_EDITARE/", "DA_PROGRAMMARE/", "ARCHIVIO/"];
+
+    // In S3/Wasabi "cartelle" = oggetti con chiave che termina con "/".
+    // Metto anche un marker "keep" per tenerle sempre visibili.
+    const ops = folders.map((f) =>
+      s3.send(
+        new PutObjectCommand({
+          Bucket: bucket,
+          Key: `${base}${f}keep`,
           Body: "",
-          ContentType: "text/plain",
-        }))
+        })
       )
     );
 
+    await Promise.all(ops);
+
     res.status(200).json({
       ok: true,
-      client,
-      created: folders.map((f) => `${base}${f}`)
+      client: name,
+      created: folders.map((f) => `${base}${f}`),
     });
-  } catch (e) {
-    console.error("create-client error:", e);
-    res.status(500).json({
-      ok: false,
-      error: String(e?.message || e),
-      name: e?.name || null,
-      http: e?.$metadata?.httpStatusCode || null
-    });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err?.message || String(err) });
   }
-});
+}
