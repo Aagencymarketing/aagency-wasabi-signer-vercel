@@ -1,4 +1,4 @@
-// api/ping.js
 export default function handler(req, res) {
-  res.status(200).json({ ok: true, now: Date.now() });
+  res.setHeader("content-type", "application/json");
+  res.status(200).send(JSON.stringify({ ok: true, path: req.url }));
 }
