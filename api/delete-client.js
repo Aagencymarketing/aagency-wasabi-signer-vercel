@@ -1,33 +1,26 @@
-// api/delete-client.js
-import { withCORS } from "./_cors";
-import { makeS3, BUCKET, ROOT_PREFIX, assertAuth } from "./_s3";
 import { ListObjectsV2Command, DeleteObjectsCommand } from "@aws-sdk/client-s3";
+import { withCORS } from "./_cors.js";
+import { makeS3, BUCKET, ROOT_PREFIX, assertAuth } from "./_s3.js";
 
-export default withCORS(async function handler(req,res){
-  try{
-    if(req.method!=="POST") return res.status(405).json({ok:false});
-    if(!assertAuth(req,res)) return;
+function ensureSlash(p){ return p && !p.endsWith("/") ? p + "/" : (p || ""); }
 
-    const { client, root } = req.body || {};
-    if(!client) return res.status(400).json({ ok:false, error:"MISSING_CLIENT" });
+export default withCORS(async (req, res) => {
+  if (req.method !== "POST") { res.status(405).json({ ok:false, error:"METHOD_NOT_ALLOWED" }); return; }
+  if (!assertAuth(req, res)) return;
 
-    const prefix = (root || ROOT_PREFIX) + client.trim() + "/";
-    const s3 = makeS3();
-    let deleted = 0, ContinuationToken;
+  const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : (req.body || {});
+  const client = String(body.client || "").trim();
+  const root = ensureSlash(body.root || ROOT_PREFIX);
+  if (!client) { res.status(400).json({ ok:false, error:"INVALID_CLIENT" }); return; }
 
-    do{
-      const page = await s3.send(new ListObjectsV2Command({ Bucket: BUCKET, Prefix: prefix, ContinuationToken }));
-      const objs = (page.Contents || []).map(o=>({ Key:o.Key }));
-      if(objs.length){
-        await s3.send(new DeleteObjectsCommand({ Bucket: BUCKET, Delete: { Objects: objs } }));
-        deleted += objs.length;
-      }
-      ContinuationToken = page.IsTruncated ? page.NextContinuationToken : undefined;
-    } while (ContinuationToken);
+  const Prefix = `${root}${client}/`;
+  const s3 = makeS3();
 
-    res.status(200).json({ ok:true, deleted });
-  }catch(e){
-    console.error("delete-client error", e);
-    res.status(500).json({ ok:false, error:"DELETE_CLIENT_FAILED" });
+  // lista e cancellazione batch
+  const listed = await s3.send(new ListObjectsV2Command({ Bucket: BUCKET, Prefix }));
+  const objs = (listed.Contents || []).map(o => ({ Key: o.Key }));
+  if (objs.length) {
+    await s3.send(new DeleteObjectsCommand({ Bucket: BUCKET, Delete: { Objects: objs } }));
   }
+  res.status(200).json({ ok:true, removedPrefix: Prefix, count: objs.length });
 });
