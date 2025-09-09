@@ -1,24 +1,44 @@
-import { CopyObjectCommand } from "@aws-sdk/client-s3";
-import { withCORS } from "./_cors.js";
-import { makeS3, BUCKET, ROOT_PREFIX, assertAuth } from "./_s3.js";
+import { ListObjectsV2Command, CopyObjectCommand } from "@aws-sdk/client-s3";
+import { s3, bucket, rootPrefix, cors, normalizeClientName } from "../s3.mjs";
 
-export default withCORS(async (req, res) => {
-  if (req.method !== "POST") { res.status(405).json({ ok:false, error:"METHOD_NOT_ALLOWED" }); return; }
-  if (!assertAuth(req, res)) return;
+export default async function handler(req, res) {
+  if (cors(req, res)) return;
+  try {
+    if (req.method !== "POST") {
+      res.status(405).json({ ok: false, error: "METHOD_NOT_ALLOWED" });
+      return;
+    }
+    const { client } = req.body || {};
+    const cname = normalizeClientName(client);
+    if (!cname) {
+      res.status(400).json({ ok: false, error: "CLIENT_REQUIRED" });
+      return;
+    }
 
-  const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : (req.body || {});
-  const { key } = body;
-  if (!key) { res.status(400).json({ ok:false, error:"MISSING_KEY" }); return; }
+    const from = `${rootPrefix}${cname}/DA_PROGRAMMARE/`;
+    const to = `${rootPrefix}${cname}/ARCHIVIO/`;
 
-  // rimpiazza la cartella con ARCHIVIO mantenendo il resto del path
-  const archivedKey = key.replace(/\/VIDEO_DA_PROGRAMMARE\//, "/ARCHIVIO/");
+    const list = await s3.send(new ListObjectsV2Command({
+      Bucket: bucket,
+      Prefix: from,
+      MaxKeys: 1000
+    }));
 
-  const s3 = makeS3();
-  await s3.send(new CopyObjectCommand({
-    Bucket: BUCKET,
-    CopySource: `/${BUCKET}/${key}`,
-    Key: archivedKey
-  }));
+    const contents = (list.Contents || []).filter(o => o.Key && !o.Key.endsWith("/") && !/\/keep$/.test(o.Key));
+    await Promise.all(
+      contents.map(obj => {
+        const destKey = to + obj.Key.substring(from.length);
+        return s3.send(new CopyObjectCommand({
+          Bucket: bucket,
+          CopySource: `/${bucket}/${obj.Key}`,
+          Key: destKey
+        }));
+      })
+    );
 
-  res.status(200).json({ ok:true, from: key, to: archivedKey });
-});
+    res.status(200).json({ ok: true, copied: contents.length });
+  } catch (err) {
+    console.error("clone-to-archive error:", err);
+    res.status(500).json({ ok: false, error: err?.message || String(err) });
+  }
+}
