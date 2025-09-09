@@ -1,30 +1,64 @@
 import { ListObjectsV2Command } from "@aws-sdk/client-s3";
-import { withCORS } from "./_cors.js";
-import { makeS3, BUCKET, ROOT_PREFIX, assertAuth } from "./_s3.js";
+import { s3, bucket, rootPrefix } from "../s3.mjs";
 
-function ensureSlash(p) { return p && !p.endsWith("/") ? p + "/" : (p || ""); }
+// CORS inline
+function applyCORS(req, res) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, x-agency-token");
+  if (req.method === "OPTIONS") {
+    res.status(200).end();
+    return true;
+  }
+  return false;
+}
 
-export default withCORS(async (req, res) => {
-  if (req.method !== "POST") { res.status(405).json({ ok:false, error:"METHOD_NOT_ALLOWED" }); return; }
-  if (!assertAuth(req, res)) return;
+export default async function handler(req, res) {
+  if (applyCORS(req, res)) return;
 
-  const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : (req.body || {});
-  const client = String(body.client || "").trim();
-  const folder = String(body.folder || "VIDEO_DA_EDITARE/").trim();
-  const root = ensureSlash(body.root || ROOT_PREFIX);
-  if (!client) { res.status(400).json({ ok:false, error:"INVALID_CLIENT" }); return; }
+  try {
+    if (req.method !== "GET") {
+      res.status(405).json({ ok: false, error: "METHOD_NOT_ALLOWED" });
+      return;
+    }
 
-  const Prefix = `${root}${client}/${ensureSlash(folder)}`;
-  const s3 = makeS3();
+    const client = String(req.query.client || "").trim();
+    const folder = String(req.query.folder || "VIDEO_DA_EDITARE/").trim();
 
-  const out = await s3.send(new ListObjectsV2Command({ Bucket: BUCKET, Prefix, Delimiter: "/" }));
-  const files = (out.Contents || [])
-    .filter(o => !o.Key.endsWith("/.keep"))
-    .map(o => ({
-      key: o.Key,
-      name: o.Key.substring(Prefix.length),
-      size: o.Size,
-      lastModified: o.LastModified
-    }));
-  res.status(200).json({ ok:true, prefix: Prefix, files });
-});
+    if (!client) {
+      res.status(400).json({ ok: false, error: "CLIENT_REQUIRED" });
+      return;
+    }
+
+    const prefix = `${rootPrefix}${client}/${folder}`;
+    const resp = await s3.send(
+      new ListObjectsV2Command({
+        Bucket: bucket,
+        Prefix: prefix,
+        Delimiter: "/",
+        MaxKeys: 1000,
+      })
+    );
+
+    const files =
+      (resp.Contents || [])
+        .filter((o) => o.Key && !o.Key.endsWith("/")) // esclude “cartelle”
+        .filter((o) => !/\/keep$/.test(o.Key)) // esclude il marker
+        .map((o) => ({
+          key: o.Key,
+          name: o.Key.replace(prefix, ""),
+          size: o.Size || 0,
+          lastModified: o.LastModified || null,
+        })) || [];
+
+    res.status(200).json({
+      ok: true,
+      client,
+      folder,
+      count: files.length,
+      files,
+    });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err?.message || String(err) });
+  }
+}
